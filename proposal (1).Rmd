@@ -1,0 +1,217 @@
+
+---
+title: "STAT 3240 Project Proposal"
+author: "PROJECT GROUP"
+date: "01/10/2024 `r Sys.Date()`"
+output:
+  html_document:
+    fig_caption: yes
+    theme: lumen
+    toc: yes
+    toc_depth: 2
+    df_print: kable
+    toc_float:
+      collapsed: no
+---
+
+```{r, message=FALSE}
+# Load all packages here:
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(janitor)
+
+# Set seed value of random number generator to get "replicable" random numbers.
+# The choice of seed value of 76 was an arbitrary one on my part.
+set.seed(76)
+```
+
+# Big-picture
+
+## Research question
+
+_What is your research question?_
+How does the use of Artificial Intelligence affect college student grade and academic performance?
+
+## Description of data
+
+_Please give a very short description of the data set along with it's original source._
+The data set, sourced from Kaggle, provides information on various factors influencing college students' academic performance, with a focus on the knowledge of Artificial Intelligence (AI). 
+
+
+# Data
+
+## Load data into R
+
+_Include the code to load your data here. If your data is not confidential nor is it private in nature, consider publishing it as a `.csv` file on Google Sheets as in the code chunk below; instructions on how to do this are in Steps 1-6 [here](https://twitter.com/rudeboybert/status/1055821846539591680). If the data shouldn't be published online, then please submit the spreadsheet file on Moodle._
+
+```{r}
+library(readr)
+studentp <- read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vRhKd_zI7lzSzqg6sG4aSes4GqGNKJr672S_MjGDuaQdXVXTl5GIQ6B-uSg9i_sD1vnzsuottRg0iy9/pub?gid=763522175&single=true&output=csv")
+```
+
+## Clean variable names
+
+_Pipe your data frame into the `clean_names()` function from the `janitor` package. Then be sure to overwrite the original data frame with this new data frame using the `<-` assignment operator. This will clean your variable names, making them easier to work with._
+
+```{r}
+studentp <- studentp %>%
+  clean_names()
+glimpse(studentp)
+```
+
+## Data wrangling
+
+_Complete your data wrangling here_: 
+
+```{r}
+
+```
+
+
+
+***
+
+
+# Preview of data
+
+## Pare down variables
+
+_`select()` the following variables **in this order** and drop all others. Eliminating all unnecessary variables will making visually exploring the raw values less taxing mentally, as we'll have less data to look at._
+
+1. _First: The identification variable (if any)_
+1. _Second: The outcome variable $y$_
+1. _Third: The numerical explanatory variable_
+1. _Fourth: The categorical explanatory variable_
+1. _Rest: any other variables you find interesting_
+
+```{r}
+studentp <- studentp %>%
+    select(writing_score, q1_ai_knowledge, q13_year_of_study , q16_gpa)
+
+```
+
+## Look at your data using glimpse
+
+_Look at your data using the `glimpse()` function._
+
+```{r}
+glimpse(studentp)
+```
+
+## Show a preview of your data
+
+_Look at your data another way by displaying a random sample of 5 rows of your data frame by piping it into the `sample_n(5)` function from the `dplyr` package._
+
+```{r}
+studentp %>%
+  sample_n(5)
+na.omit(studentp)
+
+```
+
+
+
+***
+
+
+
+# Exploratory data analysis
+
+_Let's do an little exploratory data analysis._
+
+## Inspect for missing values
+
+_Address missing values._
+
+
+```{r}
+colSums(is.na(studentp))
+```
+
+
+## Summary statistics
+
+_Compute some quick summary statistics of the outcome variable and comment._
+
+```{r}
+studentp %>%
+  group_by(q13_year_of_study) %>%
+  summarize(n=n(),
+            correlation = cor(writing_score, q1_ai_knowledge),
+            mean = mean(writing_score, na.rm = TRUE),
+            median = median(writing_score, na.rm = TRUE),
+            sd = sd(writing_score, na.rm = TRUE))
+
+```
+
+
+## Histogram of outcome variable 
+
+_Visualize the distribution of the outcome variable using a histogram and comment._
+
+```{r, fig.cap = "Figure 1. Histogram of Student WWriting Score and Number of Students", fig.align = "center", fig.width=16/2, fig.height=9/2}
+ggplot(studentp, aes( x= writing_score))+
+  geom_histogram(binwidth= 2, color = "white", fill = "green")+
+  labs(x = "Student Writing Score", y = "Number of Students")
+```
+
+
+
+## Scatterplot 
+
+_Visualize the relationship of the outcome variable and the numerical explanatory variable using a scatterplot and comment._
+
+```{r, fig.cap = "Figure 2. Scatterplot of Student Knowledge of AI against Student Writing Score", fig.align = "center", fig.width=16/2, fig.height=9/2}
+ggplot(studentp, aes(x = q1_ai_knowledge, y = writing_score ))+
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE ) +
+  labs(y = "Students Writing Score", 
+       x = "Student Knowledge of AI")
+```
+
+
+## Boxplot
+
+_Visualize the relationship of the outcome variable and the categorical explanatory variable using a scatterplot and comment._
+
+```{r, fig.cap = "Figure 3. Boxplot of Years of Study and Student Writing Score", fig.align = "center", fig.width=16/2, fig.height=9/2}
+ggplot(studentp, aes(x = q13_year_of_study, y = writing_score, fill = q13_year_of_study)) +
+  geom_boxplot() +
+  labs(y = "Student Writing Scores", x = "Years of Study")
+```
+
+## Colored scatterplot
+
+_Visualize the relationship of the outcome variable and both explanatory variables using a colored scatterplot and comment._
+
+```{r, fig.cap = "Figure 4. Scatterplot of Student AI Knowledge and Writing Scores", fig.align = "center", fig.width=16/2, fig.height=9/2}
+ggplot(studentp, aes(x = q1_ai_knowledge, y = writing_score, color = q13_year_of_study))+
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE ) +
+  labs(y = "Student Writing Score", x = "Student AI Knowledge")
+```
+
+
+
+
+# Author Statement
+
+## Individual Roles
+
+_Describe the role (Facilitator, Recorder, Reporter, Time Keeper, Checker) and level of contribution of each group member during this project phase_ 
+Facilitator: Olamipo Amusa
+Recorder: Parvesh Kumar Jogeea
+Reporter: Arianna Lockhart
+Time Keeper: Kevin Davies
+Checker: Oluwatomilayo Faloseyi
+
+## Individual Contribution
+
+_If your group were to earn 5 points on this submission, how should those points be shared across your group members?_
+Olampio Amusa = 1
+Parvesh Kumar Jogeea = 1
+Arianna Lockhart = 1
+Kevin Davies = 1
+Oluwatomilayo Faloseyi = 1
+
