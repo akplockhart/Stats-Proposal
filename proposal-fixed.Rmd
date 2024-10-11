@@ -100,14 +100,14 @@ studentp %>%
 ```
 ## Histogram of outcome variable 
 _Visualize the distribution of the outcome variable using a histogram and comment._
-```{r, fig.cap = "Figure 1. WRITE A TITLE HERE", fig.align = "center", fig.width=16/2, fig.height=9/2}
+```{r, fig.cap = "Figure 1. Histogram of Student Writing Score and The Number of Students with those scores", fig.align = "center", fig.width=16/2, fig.height=9/2}
 ggplot(studentp, aes( x= writing_score))+
   geom_histogram(binwidth= 2, color = "white", fill = "green")+
   labs(x = "Student Writing Score", y = "Number of Students")
 ```
 ## Scatterplot 
 _Visualize the relationship of the outcome variable and the numerical explanatory variable using a scatterplot and comment._
-```{r, fig.cap = "Figure 2. WRITE A TITLE HERE", fig.align = "center", fig.width=16/2, fig.height=9/2}
+```{r, fig.cap = "Figure 2. SScatterplot of Student writing Scores and their Knowledge of AI", fig.align = "center", fig.width=16/2, fig.height=9/2}
 ggplot(studentp, aes(x = ai_knowledge, y = writing_score ))+
   geom_point() +
   geom_smooth(method = "lm", se = FALSE ) +
@@ -116,14 +116,14 @@ ggplot(studentp, aes(x = ai_knowledge, y = writing_score ))+
 ```
 ## Boxplot
 _Visualize the relationship of the outcome variable and the categorical explanatory variable using a scatterplot and comment._
-```{r, fig.cap = "Figure 3. WRITE A TITLE HERE", fig.align = "center", fig.width=16/2, fig.height=9/2}
+```{r, fig.cap = "Figure 3. Boxplot of Student Writing Scores and Years of Study", fig.align = "center", fig.width=16/2, fig.height=9/2}
 ggplot(studentp, aes(x = year_of_study, y = writing_score, fill = year_of_study)) +
   geom_boxplot() +
   labs(y = "Student Writing Scores", x = "Years of Study")
 ```
 ## Colored scatterplot
 _Visualize the relationship of the outcome variable and both explanatory variables using a colored scatterplot and comment._
-```{r, fig.cap = "Figure 4. WRITE A TITLE HERE", fig.align = "center", fig.width=16/2, fig.height=9/2}
+```{r, fig.cap = "Figure 4. Colored Scatterplot of Student Writiing Scores and Their knowledge of AI using year of study", fig.align = "center", fig.width=16/2, fig.height=9/2}
 ggplot(studentp, aes(x = ai_knowledge, y = writing_score, color = year_of_study))+
   geom_point() +
   geom_smooth(method = "lm", se = FALSE ) +
