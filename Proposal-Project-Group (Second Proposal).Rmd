@@ -1,0 +1,170 @@
+---
+title: "STAT 3240 Project Proposal"
+author: "PROJECT GROUP"
+date: "Last updated on `r Sys.Date()`"
+output:
+  html_document:
+    fig_caption: yes
+    theme: lumen
+    toc: yes
+    toc_depth: 2
+    df_print: kable
+    toc_float:
+      collapsed: no
+---
+```{r, message=FALSE}
+# Load all packages here:
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(janitor)
+# Set seed value of random number generator to get "replicable" random numbers.
+# The choice of seed value of 76 was an arbitrary one on my part.
+set.seed(76)   
+```
+# Big-picture
+## Research question
+_What is your research question?_
+
+What is the relationship between sleep duration and academic performance among students? H0:β1 = 0 : There is no significant relationship between sleep duration and academic performance .
+
+H1:β1 = 0 : There is a significant relationship between sleep duration and academic performance .
+
+## Description of data
+_Please give a very short description of the data set along with it's original source._
+The dataset contains information on various factors potentially influencing student academic performance, measured as scores. Key variables include:
+
+Study Time: Hours spent studying
+Sleep Time: Hours of sleep per night
+GPA: Current GPA of the student
+Extracurricular Activities: Participation level in extracurriculars
+Health Status: General health rating
+
+This makes it suitable for exploring the relationship between sleep hours and academic performance. By examining the correlation between sleep hours and GPA, we can analyze if, and to what extent, sleep impacts students' academic outcomes.
+
+link - https://www.kaggle.com/datasets/nikhil7280/student-performance-multiple-linear-regression
+
+# Data
+## Load data into R
+_Include the code to load your data here. If your data is not confidential nor is it private in nature, consider publishing it as a `.csv` file on Google Sheets as in the code chunk below; instructions on how to do this are in Steps 1-6 [here](https://twitter.com/rudeboybert/status/1055821846539591680). If the data shouldn't be published online, then please submit the spreadsheet file on Moodle._
+ 
+```{r}
+library(readr)
+SleepStudy_GPA <- read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQXWCWPqRiLmuOiWMqqSrQzzLssdMgVIygcW6HUQL47IRmjaIcfHZRPCn52wB6IGa9DWksNXJk3ygtj/pub?output=csv")
+```
+## Clean variable names
+_Pipe your data frame into the `clean_names()` function from the `janitor` package. Then be sure to overwrite the original data frame with this new data frame using the `<-` assignment operator. This will clean your variable names, making them easier to work with._
+```{r}
+SleepStudy_GPA <- SleepStudy_GPA %>%
+  clean_names()
+glimpse(SleepStudy_GPA)
+```
+## Data wrangling
+_Complete your data wrangling here_:    
+```{r}
+SleepStudy_GPA$hours_studied<-as.factor(SleepStudy_GPA$hours_studied)
+```
+***
+# Preview of data
+## Pare down variables
+_`select()` the following variables **in this order** and drop all others. Eliminating all unnecessary variables will making visually exploring the raw values less taxing mentally, as we'll have less data to look at._
+1. _First: The identification variable (if any)_
+1. _Second: The outcome variable $y$_
+1. _Third: The numerical explanatory variable_
+1. _Fourth: The categorical explanatory variable_
+1. _Rest: any other variables you find interesting_
+```{r}
+SleepStudy_GPA <- SleepStudy_GPA %>%
+    select(performance_index, sleep_hours, hours_studied , previous_scores)
+```
+## Look at your data using glimpse
+_Look at your data using the `glimpse()` function._
+```{r}
+glimpse(SleepStudy_GPA)
+```
+## Show a preview of your data
+_Look at your data another way by displaying a random sample of 5 rows of your data frame by piping it into the `sample_n(5)` function from the `dplyr` package._
+```{r}
+ na.omit(SleepStudy_GPA)%>%
+  sample_n(5)
+```
+***
+# Exploratory data analysis
+_Let's do an little exploratory data analysis._
+## Inspect for missing values
+  
+Address missing values: We have 909 NAs and we remove them from our dataset
+```{r}
+colSums(is.na(SleepStudy_GPA))
+
+SleepStudy_GPA<-na.omit(SleepStudy_GPA) #removing NAs
+colSums(is.na(SleepStudy_GPA))
+
+```
+## Summary statistics
+_Compute some quick summary statistics of the outcome variable and comment._
+```{r}
+SleepStudy_GPA %>%
+  group_by(hours_studied) %>%
+  summarize(n=n(),
+            correlation = cor(performance_index, sleep_hours),
+            mean = mean(performance_index, na.rm = TRUE),
+            median = median(performance_index, na.rm = TRUE),
+            sd = sd(performance_index, na.rm = TRUE))
+```
+## Histogram of outcome variable 
+_Visualize the distribution of the outcome variable using a histogram and comment._
+```{r, fig.cap = "Figure 1. Histogram of Studetns with Similar Perfomance Index", fig.align = "center", fig.width=16/2, fig.height=9/2}
+ggplot(SleepStudy_GPA, aes( x= performance_index))+
+  geom_histogram(binwidth= 2, color ="black", fill = "green")+
+  labs(x = "Student Performance Index", y = "Number of Students")
+```
+## Scatterplot 
+_Visualize the relationship of the outcome variable and the numerical explanatory variable using a scatterplot and comment._
+```{r, fig.cap = "Figure 2.Scatterplot of Student Performance Index and the amount of sleep they go", fig.align = "center", fig.width=16/2, fig.height=9/2}
+ggplot(SleepStudy_GPA, aes(x = sleep_hours, y = performance_index ))+
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE ) +
+  labs(y = "Students Performance Index", 
+       x = "Student Sleep Hours")
+```
+## Boxplot
+_Visualize the relationship of the outcome variable and the categorical explanatory variable using a scatterplot and comment._
+```{r, fig.cap = "Figure 3.  Boxplot of Students Perfomance Index and the amount of sleep they got", fig.align = "center", fig.width=16/2, fig.height=9/2}
+ggplot(SleepStudy_GPA, aes(x = hours_studied, y = performance_index, fill = hours_studied)) +
+  geom_boxplot() +
+  labs(y = "Student Perfomance Index", x = "Student Sleep Hours")
+```
+## Colored scatterplot
+_Visualize the relationship of the outcome variable and both explanatory variables using a colored scatterplot and comment._
+```{r, fig.cap = "Figure 4.Colored Scatterplot of Student Performance Index and the amount of sleep they got.", fig.align = "center", fig.width=16/2, fig.height=9/2}
+ggplot(SleepStudy_GPA, aes(x = sleep_hours, y = performance_index, color = hours_studied))+
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE ) +
+  labs(y = "Student Performance Index", x = "Student Sleep Hours")
+```
+# Author Statement
+## Individual Roles
+_Describe the role (Facilitator, Recorder, Reporter, Time Keeper, Checker) and level of contribution of each group member during this project phase_ 
+Facilitator: Olamipo Amusa
+
+Recorder: Parvesh Kumar Jogeea
+
+Reporter: Arianna Lockhart
+
+Time Keeper: Kevin Davies
+
+Checker: Oluwatomilayo Faloseyi
+
+## Individual Contribution
+_If your group were to earn 5 points on this submission, how should those points be shared across your group members?_
+
+Olampio Amusa = 1
+
+Parvesh Kumar Jogeea = 1
+
+Arianna Lockhart = 1
+
+Kevin Davies = 1
+
+Oluwatomilayo Faloseyi = 1
